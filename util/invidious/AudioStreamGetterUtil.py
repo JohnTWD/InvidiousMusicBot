@@ -1,4 +1,4 @@
-from instances import currentActiveInstance
+from constants import currentActiveInstance
 from dataclasses import dataclass
 from enum import Enum
 import requests

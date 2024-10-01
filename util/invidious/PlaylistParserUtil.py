@@ -1,6 +1,6 @@
 import os
 import requests
-from instances import currentActiveInstance
+from constants import currentActiveInstance
 from classes.VideoObject import VideoObject
 from classes.PlaylistVideo import PlaylistVideo
 

@@ -3,6 +3,7 @@ import os
 INSTANCELIST: tuple = ("https://inv.nadeko.net", )
 currentActiveInstance = INSTANCELIST[0]
 
+CMD_PREFIX: str = "$ivm "
 
 def getToken() -> str:
 	if (not os.path.exists(".privatetoken")):
