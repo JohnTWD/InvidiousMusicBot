@@ -21,7 +21,7 @@ class Commands:
 
 		shouldCapture: bool = False
 		for cmdArg in argsArr:
-			if ((not shouldCapture) and (cmdArg == ("--" + command.getCommand()) or cmdArg == ('-' + command.getAlias()))):
+			if ((not shouldCapture) and (cmdArg == (f"--{self.command}") or cmdArg == (f"-{self.command}"))):
 				shouldCapture = True
 				retArgs.append(cmdArg)
 				continue	# we dont want go to the startswith check, because we are including the first argument
