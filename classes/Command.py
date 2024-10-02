@@ -1,3 +1,4 @@
+'''
 import discord
 import shlex
 
@@ -33,4 +34,4 @@ class Command:
 				retArgs.append(cmdArg.strip('"'))
 
 		return retArgs
-
+'''

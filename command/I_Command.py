@@ -1,3 +1,4 @@
+import discord
 from abc import ABC, abstractmethod
 
 class I_Command(ABC): # interface for commands
@@ -8,7 +9,7 @@ class I_Command(ABC): # interface for commands
 		self.description: str = description
 
 	@abstractmethod 
-	def onInvoke(self, argsArr: list[str]): pass
+	async def onInvoke(self, dcMsg: discord.Message, argsArr: list[str]): pass
 
 	def isCalled(self, argsArr: list[str]):
 		return (("--" + self.command) in argsArr) or (('-' + self.alias) in argsArr)

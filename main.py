@@ -1,10 +1,11 @@
 import discord
 import requests
-from classes.Command import Command
+from command.Commands import Commands
 from util.invidious.PlaylistParserUtil import getPlaylist
 from constants import currentActiveInstance, getToken, CMD_PREFIX
 from util.invidious.AudioStreamGetterUtil import getValidAudioStreamUrls, AudioQuality
 
+CommandHandler: Commands = Commands()
 
 class IVMBot(discord.Client):
 	async def on_ready(self):
@@ -17,20 +18,8 @@ class IVMBot(discord.Client):
 		if (not message.content.startswith(CMD_PREFIX)):
 			return
 		
-		calledCmdObj: Command = Command("called", 'c')
-		argTestObj	: Command = Command("argt", 'a')
-
-		if (calledCmdObj.isCalled(message)):
-			await message.channel.send("Indeed you are called")
-
-		if (argTestObj.isCalled(message)):
-			formedStr: str = "Function called with arguments:\n"
-			argsTestArgs: list[str] = argTestObj.getArgs(message)
-
-			for i in argsTestArgs:
-				formedStr += f"{i}, "
-
-			await message.channel.send(formedStr)
+		await CommandHandler.tryInvokes(message)
+		
 def main():
 	intents = discord.Intents.default()
 	intents.message_content = True

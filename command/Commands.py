@@ -1,12 +1,15 @@
 import shlex
-from I_Command import I_Command
-from commands.TestCommand import TestCommand
+import discord
+from command.I_Command import I_Command
+from command.commands.TestCommand import TestCommand
+from command.commands.ExamCommand import ExamCommand
 
 
 class Commands:
 	def __init__(self):
 		self.commandList: list[I_Command] = []
 		self.commandList.append(TestCommand())
+		self.commandList.append(ExamCommand())
 
 	@staticmethod
 	def __getSubCmdArgs(argsArr: list[str], command: I_Command):
@@ -32,15 +35,10 @@ class Commands:
 
 		return retArgs
 
-	def tryInvokes(self, rawArgs: str):
-		argsArr: list[str] = shlex.split(rawArgs, posix=False)
+	async def tryInvokes(self, dcMsg: discord.Message):
+		argsArr: list[str] = shlex.split(dcMsg.content, posix=False)
 
 		for command in self.commandList:
 			assert issubclass(type(command), I_Command) # need this or else linter will not recognize command
 			if (command.isCalled(argsArr)):
-				print(f"Yes indeed, {command.getCommand()} is called.")
-				command.onInvoke(self.__getSubCmdArgs(argsArr, command))
-
-
-
-#print(Commands().tryInvokes("asdasjd asoidjwq -t whuh 89213812 \"FUCK YOU NIGGER\""))
+				await command.onInvoke(dcMsg, self.__getSubCmdArgs(argsArr, command))
