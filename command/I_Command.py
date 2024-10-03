@@ -12,7 +12,7 @@ class I_Command(ABC): # interface for commands
 	async def onInvoke(self, dcMsg: discord.Message, argsArr: list[str]): pass
 
 	def isCalled(self, argsArr: list[str]):
-		return ((f"--{self.command}") in argsArr) or ((f"-{self.command}") in argsArr)
+		return ((f"--{self.command}") in argsArr) or ((f"-{self.alias}") in argsArr)
 
 	def getDescription(self):
 		return self.description

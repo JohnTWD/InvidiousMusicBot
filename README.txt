@@ -8,6 +8,7 @@ https://docs.invidious.io/api/
 
 
 Todo:
+	- https://www.geeksforgeeks.org/python-sqlite/ Learn sqlite
 	- General:
 		- [ ] (1)Properly implelement usage backup instances
 	- Playlist tracker:

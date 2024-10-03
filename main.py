@@ -1,11 +1,9 @@
 import discord
 import requests
-from command.Commands import Commands
+from command.CommandHandler import tryInvokes
 from util.invidious.PlaylistParserUtil import getPlaylist
 from constants import currentActiveInstance, getToken, CMD_PREFIX
 from util.invidious.AudioStreamGetterUtil import getValidAudioStreamUrls, AudioQuality
-
-CommandHandler: Commands = Commands()
 
 class IVMBot(discord.Client):
 	async def on_ready(self):
@@ -18,7 +16,7 @@ class IVMBot(discord.Client):
 		if (not message.content.startswith(CMD_PREFIX)):
 			return
 		
-		await CommandHandler.tryInvokes(message)
+		await tryInvokes(message) # part of CommandHandler
 		
 def main():
 	intents = discord.Intents.default()
