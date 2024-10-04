@@ -3,14 +3,16 @@ import discord
 from command.I_Command import I_Command
 from command.commands.TestCommand import TestCommand
 from command.commands.ExamCommand import ExamCommand
+from command.commands.HelpCommand import HelpCommand
 
 commandList: tuple[I_Command] = (
 	TestCommand(),
-	ExamCommand()
+	ExamCommand(),
+	HelpCommand()
 )
 
 @staticmethod
-def __getSubCmdArgs(argsArr: list[str], command: I_Command):
+def __getSubCmdArgs(argsArr: list[str], command: I_Command) -> list[str]:
 	# Handler to get arguments from subcommands
 	# If a subcommand exists, it returns a list with [0] being the subcommand and the rest, passed arguments
 	# If it does not, it returns an empty list
@@ -32,7 +34,7 @@ def __getSubCmdArgs(argsArr: list[str], command: I_Command):
 
 	return retArgs
 
-async def tryInvokes(dcMsg: discord.Message):
+async def tryInvokes(dcMsg: discord.Message) -> None:
 	argsArr: list[str] = shlex.split(dcMsg.content, posix=False)
 
 	for command in commandList:

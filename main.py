@@ -15,7 +15,7 @@ class IVMBot(discord.Client):
 
 		if (not message.content.startswith(CMD_PREFIX)):
 			return
-		
+			
 		await tryInvokes(message) # part of CommandHandler
 		
 def main():
@@ -23,5 +23,4 @@ def main():
 	intents.message_content = True
 	IVMBotClient = IVMBot(intents=intents)
 	IVMBotClient.run(getToken())
-
 if (__name__=="__main__"):	main()
