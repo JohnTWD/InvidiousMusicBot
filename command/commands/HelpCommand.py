@@ -24,6 +24,6 @@ Available commands:"""
 		from command.CommandHandler import commandList
 		for command in commandList:
 			assert issubclass(type(command), I_Command)
-			helpMessage += f"\n{command.getCommand()} | {command.getDescription()}\t | Usage: `-{command.getAlias()} {command.getUsageHelp()}`"
+			helpMessage += f"\n{command.getCommand()} | {command.getDescription()} | Usage: `-{command.getAlias()} {command.getUsageHelp()}`"
 
 		await dcMsg.channel.send(helpMessage)
