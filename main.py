@@ -1,9 +1,7 @@
 import discord
 import requests
 from command.CommandHandler import tryInvokes
-from util.invidious.PlaylistParserUtil import getPlaylist
 from constants import currentActiveInstance, getToken, CMD_PREFIX
-from util.invidious.AudioStreamGetterUtil import getValidAudioStreamUrls, AudioQuality
 
 class IVMBot(discord.Client):
 	async def on_ready(self):
