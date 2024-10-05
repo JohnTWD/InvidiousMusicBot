@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from classes.PlaylistVideo import PlaylistVideo
+from classes.VideoObject import VideoObject
 
 @dataclass
 class PlaylistObject:
@@ -7,4 +7,12 @@ class PlaylistObject:
 	title: 		str
 	author: 	str
 	authorId: 	str
-	videos:		set[PlaylistVideo]
+	videos:		list[VideoObject]
+
+	def returnMetadataTuple(self) -> tuple[str]:
+		return (
+			self.playlistId,
+			self.title,
+			self.author,
+			self.authorId
+		)

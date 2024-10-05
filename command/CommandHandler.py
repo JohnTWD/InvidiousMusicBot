@@ -4,11 +4,13 @@ from command.I_Command import I_Command
 from command.commands.TestCommand import TestCommand
 from command.commands.ExamCommand import ExamCommand
 from command.commands.HelpCommand import HelpCommand
+from command.commands.CheckPlaylistCommand import CheckPlaylistCommand
 
 commandList: tuple[I_Command] = (
 	TestCommand(),
 	ExamCommand(),
-	HelpCommand()
+	HelpCommand(),
+	CheckPlaylistCommand()
 )
 
 @staticmethod

@@ -2,26 +2,41 @@ import os
 import requests
 from constants import currentActiveInstance
 from classes.VideoObject import VideoObject
-from classes.PlaylistVideo import PlaylistVideo
+from classes.PlaylistObject import PlaylistObject
+from classes.BadPlaylistError import BadPlaylistError
 
 
-def getPlaylist(playlistID: str) -> list[PlaylistVideo]: # TODO : put this in its own file later AND have it return a value
+def getPlaylist(playlistID: str) -> PlaylistObject:
 	apiUrl: str = currentActiveInstance + "/api/v1/playlists/" + playlistID + "?page=";
 	isPlaylistEnd: bool = False
 	currentPage: int = 1
 	currVidIdx: int = -1   # note, `-1` because index of videos in the api data start at 0
-	videoList: list = []
+	videoList: list[VideoObject] = []
+	rtn: PlaylistObject = None
 
 	while (not isPlaylistEnd): # TODO: todo General-1
 		response: requests.Response = requests.get(apiUrl + str(currentPage))
-
-		if (response.status_code != 200):
-			raise Exception("Can't fetch playlist. TODO: autochange the instance if this happens")
-
 		rawPageJsonData: dict = response.json();
+
+		if (response.status_code != 200): 	# some error checking
+			if ("error" in rawPageJsonData): # check if the "error" key exists
+				errorMessage: str = rawPageJsonData["error"]
+				if (errorMessage == "Could not extract playlistSidebarRenderer."):
+					raise BadPlaylistError(playlistID)
+				else:
+					raise Exception(f"Getting playlist ({playlistID}) failed due to {errorMessage}")
+			else:
+				raise Exception(f"Getting playlist ({playlistID}) failed due to unknown error")
 
 		if (len(rawPageJsonData["videos"]) <= 0):
 			isPlaylistEnd = True
+			rtn = PlaylistObject(
+				playlistID,
+				rawPageJsonData["title"],
+				rawPageJsonData["author"],
+				rawPageJsonData["authorId"],
+				videoList
+			)
 			break 
 
 		# parse in page
@@ -31,16 +46,15 @@ def getPlaylist(playlistID: str) -> list[PlaylistVideo]: # TODO : put this in it
 
 			if (currVidIdx < pageVideoIdx): # prevent adding of duplicates
 				currVidIdx = pageVideoIdx
-				playlistVideo: PlaylistVideo = PlaylistVideo(
+				videoObject: VideoObject = VideoObject(
 					pageVideo["title"],
 					pageVideo["author"],
 					pageVideo["videoId"],
 					pageVideo["authorId"],
-					currVidIdx
 				)
-				videoList.append(playlistVideo)
+				videoList.append(videoObject)
 
 		# @ pagination end
 		currentPage += 1
-	
-	return videoList
+
+	return rtn
