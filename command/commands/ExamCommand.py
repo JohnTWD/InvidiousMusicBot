@@ -11,4 +11,4 @@ class ExamCommand(I_Command):
 		)
 
 	async def onInvoke(self, dcMsg: discord.Message, argsArr: list[str]) -> None:
-		await dcMsg.channel.send(f"exam args: {argsArr}")
+		await dcMsg.reply(f"exam args: {argsArr}")
