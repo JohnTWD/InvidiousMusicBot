@@ -6,6 +6,8 @@ This is a Discord Bot that does the following:
 API Documentation
 https://docs.invidious.io/api/
 
+https://old.reddit.com/r/Discord_Bots/comments/cmrake/sending_nonblocking_web_requests_with_discordpy/
+
 
 Todo:
 	- https://www.geeksforgeeks.org/python-sqlite/ Learn sqlite
