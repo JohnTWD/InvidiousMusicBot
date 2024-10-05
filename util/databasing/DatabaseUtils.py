@@ -7,7 +7,7 @@ from util.invidious.PlaylistParserUtil import getPlaylist
 
 __dbFolder: str = os.path.join(os.getcwd(), "databases")
 
-def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
+async def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
 	databasePath: str = os.path.join(__dbFolder, f"{guildID}.db")
 	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
 	dbCursor: sqlite3.Cursor = dbConnection.cursor()
@@ -15,7 +15,7 @@ def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
 
 	print("Attempting to get playlist...", end='')
 	try:
-		playlistObject = getPlaylist(playlistID)
+		playlistObject = await getPlaylist(playlistID)
 	except BadPlaylistError as badPlaylistError:
 		return repr(badPlaylistError)
 	except Exception as genericException:
