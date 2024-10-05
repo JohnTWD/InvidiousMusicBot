@@ -26,4 +26,4 @@ Available commands:"""
 			assert issubclass(type(command), I_Command)
 			helpMessage += f"\n{command.getCommand()} | {command.getDescription()} | Usage: `-{command.getAlias()} {command.getUsageHelp()}`"
 
-		await dcMsg.channel.send(helpMessage)
+		await dcMsg.reply(helpMessage)
