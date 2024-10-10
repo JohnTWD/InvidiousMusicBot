@@ -1,6 +1,6 @@
 import discord
 from command.I_Command import I_Command
-from util.databasing.PlaylistDatabaseUtils import updatePlaylistAndGetResponse
+from util.databasing.DatabaseUtils import updatePlaylistAndGetResponse
 
 class CheckPlaylistCommand(I_Command):
 	def __init__(self):
