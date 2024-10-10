@@ -31,12 +31,10 @@ class CheckPlaylistCommand(I_Command):
 		await dcMsg.channel.send("Successful in getting playlist information!")
 
 		registerPlaylist(playlistObject.playlistId, dcMsg.guild.id, dcMsg.channel.id)
-
-		databasePath: str = os.path.join(CONST_DBFOLDER, f"{dcMsg.guild.id}.db")
-		dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
-		dbCursor: sqlite3.Cursor = dbConnection.cursor()
-
-		initPlaylistDBEntry(dbConnection, dbCursor)
+		dbPtr: tuple[sqlite3.Connection, sqlite3.Cursor] = initPlaylistDBEntry(dcMsg.guild.id)
+		dbConnection: [sqlite3.Connection] = dbPtr[0]
+		dbCursor: [sqlite3.Cursor] = dbPtr[1]
+		del dbPtr
 
 		if (doesPlaylistExist(playlistObject.playlistId, dbConnection, dbCursor)):
 			currStoredPlaylist: PlaylistObject = readPlaylistEntry(playlistObject.playlistId, dbConnection, dbCursor)

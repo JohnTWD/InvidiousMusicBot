@@ -26,6 +26,7 @@ def readPlaylistEntry(
 
 	for row in videoRows:
 		videos.append(VideoObject(row[0], row[1], row[2], row[3]))
+	del videoRows
 
 	return PlaylistObject(playlistID, plMetadata[0], plMetadata[1], plMetadata[2], videos)
 
@@ -81,7 +82,7 @@ def registerPlaylist(playlistID: str, guildID: int, channelID: int):
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			playlistId TEXT,
 			guildID INTEGER,
-			channelID INTEGER,
+			channelID INTEGER
 		)
 	""")
 
@@ -91,10 +92,11 @@ def registerPlaylist(playlistID: str, guildID: int, channelID: int):
 	)
 	dbConnection.close()
 
-def initPlaylistDBEntry(
-	dbConnection: sqlite3.Connection, 
-	dbCursor: sqlite3.Cursor,
-) -> None:
+def initPlaylistDBEntry(guildId: int) -> tuple[sqlite3.Connection, sqlite3.Cursor]: # WARNING: YOU HAVE TO MANUALLY CLOSE THE CONNECTION LATER
+	databasePath: str = os.path.join(CONST_DBFOLDER, f"{guildId}.db")
+	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
+	dbCursor: sqlite3.Cursor = dbConnection.cursor()
+
 	dbCursor.execute("""
 		CREATE TABLE IF NOT EXISTS playlists (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -117,3 +119,5 @@ def initPlaylistDBEntry(
 		)"""
 	)
 	dbConnection.commit()
+
+	return (dbConnection, dbCursor)
