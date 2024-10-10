@@ -90,6 +90,8 @@ def registerPlaylistSchedule(playlistID: str, guildID: int, channelID: int):
 		"INSERT OR IGNORE INTO schedule (playlistId, guildID, channelID) VALUES (?, ?, ?)",
 		(playlistID, guildID, channelID)
 	)
+
+	dbConnection.commit()
 	dbConnection.close()
 
 def initPlaylistDBEntry(guildId: int) -> tuple[sqlite3.Connection, sqlite3.Cursor]: # WARNING: YOU HAVE TO MANUALLY CLOSE THE CONNECTION LATER
