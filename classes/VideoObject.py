@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-@dataclass
+@dataclass(frozen=True)
 class VideoObject:
 	title: 	  str
 	author:   str
@@ -15,3 +15,11 @@ class VideoObject:
 			self.authorId,
 			playlistId
 		)
+
+	def __eq__(self, other):
+		if isinstance(other, VideoObject):
+			return (self.videoId, self.authorId) == (other.videoId, other.authorId)
+		return False
+
+	def __hash__(self):
+		return hash((self.videoId, self.authorId))

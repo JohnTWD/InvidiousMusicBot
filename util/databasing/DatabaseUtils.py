@@ -57,29 +57,6 @@ def __createNewPlaylist(
 	dbCursor: sqlite3.Cursor,
 	playlistObject: PlaylistObject
 ) -> None:
-	dbCursor.execute("""
-		CREATE TABLE IF NOT EXISTS playlists (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			playlistId TEXT UNIQUE,
-			title TEXT,
-			author TEXT,
-			authorId TEXT
-		)"""
-	)
-
-	dbCursor.execute("""
-		CREATE TABLE IF NOT EXISTS videos (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			title TEXT,
-			author TEXT,
-			videoId TEXT,
-			authorId TEXT,
-			playlistId TEXT,
-			FOREIGN KEY (playlistId) REFERENCES playlists (playlistId)
-		)"""
-	)
-	dbConnection.commit()
-
 	dbCursor.execute( # insert playlist metadata info
 		"INSERT OR IGNORE INTO playlists (playlistId, title, author, authorId) VALUES (?, ?, ?, ?)",
 		playlistObject.returnMetadataTuple()
@@ -109,29 +86,52 @@ async def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
 	print("Successful in getting playlist information!")
 
 	databasePath: str = os.path.join(__dbFolder, f"{guildID}.db")
-	with sqlite3.connect(databasePath) as dbConnection:
-		dbCursor: sqlite3.Cursor = dbConnection.cursor()
-	
-		if (__doesPlaylistExist(playlistID, dbConnection, dbCursor)):
-			currStoredPlaylist: PlaylistObject = __readPlaylistEntry(playlistID, dbConnection, dbCursor)
-	
-			missingVid: set[VideoObject] = currStoredPlaylist.getDiff(playlistObject)
-			newlyAdded: set[VideoObject] = playlistObject.getDiff(currStoredPlaylist)
-	
-			__modifyPlaylist(playlistID, dbConnection, dbCursor, missingVid, newlyAdded)
-	
-			retStr: str = "Playlist updated with changes:"
-	
-			retStr += "\nVideos added:\n"
-			for vid in newlyAdded:
-				retStr += f"{vid.returnTupleWithPlaylist(playlistID)}\n"
-	
-			retStr += "\nVideos removed:\n"
-			for vid in missingVid:
-				retStr += f"{vid.returnTupleWithPlaylist(playlistID)}\n"
-	
-			return retStr
-	
-		__createNewPlaylist(playlistID, dbConnection, dbCursor, playlistObject)
-		dbConnection.close()
-		return f"Sucessful creation of database for playlist {playlistID}"
+	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
+	dbCursor: sqlite3.Cursor = dbConnection.cursor()
+
+	dbCursor.execute("""
+		CREATE TABLE IF NOT EXISTS playlists (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			playlistId TEXT UNIQUE,
+			title TEXT,
+			author TEXT,
+			authorId TEXT
+		)"""
+	)
+
+	dbCursor.execute("""
+		CREATE TABLE IF NOT EXISTS videos (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			title TEXT,
+			author TEXT,
+			videoId TEXT,
+			authorId TEXT,
+			playlistId TEXT,
+			FOREIGN KEY (playlistId) REFERENCES playlists (playlistId)
+		)"""
+	)
+	dbConnection.commit()
+
+	if (__doesPlaylistExist(playlistID, dbConnection, dbCursor)):
+		currStoredPlaylist: PlaylistObject = __readPlaylistEntry(playlistID, dbConnection, dbCursor)
+
+		missingVid: set[VideoObject] = currStoredPlaylist.getDiff(playlistObject)
+		newlyAdded: set[VideoObject] = playlistObject.getDiff(currStoredPlaylist)
+
+		__modifyPlaylist(playlistID, dbConnection, dbCursor, missingVid, newlyAdded)
+
+		retStr: str = "Playlist updated with changes:"
+
+		retStr += "\nVideos added:\n"
+		for vid in newlyAdded:
+			retStr += f"{vid.returnTupleWithPlaylist(playlistID)}\n"
+
+		retStr += "\nVideos removed:\n"
+		for vid in missingVid:
+			retStr += f"{vid.returnTupleWithPlaylist(playlistID)}\n"
+
+		return retStr
+
+	__createNewPlaylist(playlistID, dbConnection, dbCursor, playlistObject)
+	dbConnection.close()
+	return f"Sucessful creation of database for playlist {playlistID}"
