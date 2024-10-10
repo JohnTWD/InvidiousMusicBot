@@ -4,7 +4,7 @@ from classes.PlaylistObject import VideoObject
 from classes.PlaylistObject import PlaylistObject
 from classes.BadPlaylistError import BadPlaylistError
 from util.invidious.PlaylistParserUtil import getPlaylist
-from util.databasing.DatabaseUtils import CONST_DBFOLDER, registerPlaylist, initPlaylistDBEntry, doesPlaylistExist, readPlaylistEntry, createNewPlaylist
+from util.databasing.DatabaseUtils import CONST_DBFOLDER, registerPlaylistSchedule, initPlaylistDBEntry, doesPlaylistExist, readPlaylistEntry, createNewPlaylist
 
 class CheckPlaylistCommand(I_Command):
 	def __init__(self):
@@ -30,7 +30,7 @@ class CheckPlaylistCommand(I_Command):
 
 		await dcMsg.channel.send("Successful in getting playlist information!")
 
-		registerPlaylist(playlistObject.playlistId, dcMsg.guild.id, dcMsg.channel.id)
+		registerPlaylistSchedule(playlistObject.playlistId, dcMsg.guild.id, dcMsg.channel.id)
 		dbPtr: tuple[sqlite3.Connection, sqlite3.Cursor] = initPlaylistDBEntry(dcMsg.guild.id)
 		dbConnection: sqlite3.Connection = dbPtr[0]
 		dbCursor: sqlite3.Cursor = dbPtr[1]

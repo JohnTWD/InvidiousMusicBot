@@ -71,7 +71,7 @@ def createNewPlaylist(
 
 	dbConnection.commit()
 
-def registerPlaylist(playlistID: str, guildID: int, channelID: int):
+def registerPlaylistSchedule(playlistID: str, guildID: int, channelID: int):
 	# note channelID is not eternal and this simply stores which channel -ck was last invoked, which can change at any time
 	databasePath: str = os.path.join(CONST_DBFOLDER, f"schedule.db")
 	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
