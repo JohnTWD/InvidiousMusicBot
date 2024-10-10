@@ -32,8 +32,8 @@ class CheckPlaylistCommand(I_Command):
 
 		registerPlaylist(playlistObject.playlistId, dcMsg.guild.id, dcMsg.channel.id)
 		dbPtr: tuple[sqlite3.Connection, sqlite3.Cursor] = initPlaylistDBEntry(dcMsg.guild.id)
-		dbConnection: [sqlite3.Connection] = dbPtr[0]
-		dbCursor: [sqlite3.Cursor] = dbPtr[1]
+		dbConnection: sqlite3.Connection = dbPtr[0]
+		dbCursor: sqlite3.Cursor = dbPtr[1]
 		del dbPtr
 
 		if (doesPlaylistExist(playlistObject.playlistId, dbConnection, dbCursor)):
