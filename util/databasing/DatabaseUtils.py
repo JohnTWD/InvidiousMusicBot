@@ -83,8 +83,8 @@ def registerPlaylistSchedule(playlistID: str, guildID: int, channelID: int):
 			playlistId TEXT,
 			guildID INTEGER,
 			channelID INTEGER
-		)
-	""")
+		)"""
+	)
 
 	dbCursor.execute(
 		"INSERT OR IGNORE INTO schedule (playlistId, guildID, channelID) VALUES (?, ?, ?)",
