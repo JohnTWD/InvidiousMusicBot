@@ -2,6 +2,7 @@ import discord
 from command.I_Command import I_Command
 from classes.PlaylistObject import VideoObject
 from classes.PlaylistObject import PlaylistObject
+from classes.BadPlaylistError import BadPlaylistError
 from util.databasing.DatabaseUtils import CONST_DBFOLDER, registerPlaylist, initPlaylistDBEntry, doesPlaylistExist, readPlaylistEntry, createNewPlaylist
 
 class CheckPlaylistCommand(I_Command):
