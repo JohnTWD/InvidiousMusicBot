@@ -18,7 +18,7 @@ class CheckPlaylistCommand(I_Command):
 
 		playlistObject: PlaylistObject = None
 		try:
-			playlistObject = await getPlaylist(playlistID)
+			playlistObject = await getPlaylist(argsArr[1])
 		except BadPlaylistError as badPlaylistError:
 			await dcMsg.reply(repr(badPlaylistError))
 			return
@@ -28,14 +28,16 @@ class CheckPlaylistCommand(I_Command):
 
 		await dcMsg.channel.send("Successful in getting playlist information!")
 
+		registerPlaylist(playlistObject.playlistId, dcMsg.guild.id, dcMsg.channel.id)
+
 		databasePath: str = os.path.join(CONST_DBFOLDER, f"{dcMsg.guild.id}.db")
 		dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
 		dbCursor: sqlite3.Cursor = dbConnection.cursor()
 
 		initPlaylistDBEntry(dbConnection, dbCursor)
 
-		if (doesPlaylistExist(playlistID, dbConnection, dbCursor)):
-			currStoredPlaylist: PlaylistObject = readPlaylistEntry(playlistID, dbConnection, dbCursor)
+		if (doesPlaylistExist(playlistObject.playlistId, dbConnection, dbCursor)):
+			currStoredPlaylist: PlaylistObject = readPlaylistEntry(playlistObject.playlistId, dbConnection, dbCursor)
 
 			missingVid: set[VideoObject] = currStoredPlaylist.getDiff(playlistObject)
 			newlyAdded: set[VideoObject] = playlistObject.getDiff(currStoredPlaylist)
@@ -43,21 +45,21 @@ class CheckPlaylistCommand(I_Command):
 			if (len(missingVid) == 0 and len(newlyAdded) == 0):
 				await dcMsg.reply("No changes found since last update")
 			else:
-				modifyPlaylist(playlistID, dbConnection, dbCursor, missingVid, newlyAdded)
+				modifyPlaylist(playlistObject.playlistId, dbConnection, dbCursor, missingVid, newlyAdded)
 
 				retStr: str = "Playlist updated with changes:"
 
 				retStr += "\nVideos added:\n"
 				for vid in newlyAdded:
-					retStr += f"`{vid.returnTupleWithPlaylist(playlistID)}`\n"
+					retStr += f"`{vid.returnTupleWithPlaylist(playlistObject.playlistId)}`\n"
 
 				retStr += "\nVideos removed:\n"
 				for vid in missingVid:
-					retStr += f"`{vid.returnTupleWithPlaylist(playlistID)}`\n"
+					retStr += f"`{vid.returnTupleWithPlaylist(playlistObject.playlistId)}`\n"
 
 				await dcMsg.reply(retStr)
 		else:
-			createNewPlaylist(playlistID, dbConnection, dbCursor, playlistObject)
-			await dcMsg.reply(f"Sucessful creation of database for playlist {playlistID}")
+			createNewPlaylist(playlistObject.playlistId, dbConnection, dbCursor, playlistObject)
+			await dcMsg.reply(f"Sucessful creation of database for playlist {playlistObject.playlistId}")
 		
 		dbConnection.close()
