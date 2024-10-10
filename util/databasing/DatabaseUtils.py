@@ -2,7 +2,6 @@ import os
 import sqlite3
 from classes.PlaylistObject import VideoObject
 from classes.PlaylistObject import PlaylistObject
-from util.invidious.PlaylistParserUtil import getPlaylist
 
 CONST_DBFOLDER: str = os.path.join(os.getcwd(), "databases")
 

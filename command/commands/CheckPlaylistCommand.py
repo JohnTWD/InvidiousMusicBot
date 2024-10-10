@@ -3,6 +3,7 @@ from command.I_Command import I_Command
 from classes.PlaylistObject import VideoObject
 from classes.PlaylistObject import PlaylistObject
 from classes.BadPlaylistError import BadPlaylistError
+from util.invidious.PlaylistParserUtil import getPlaylist
 from util.databasing.DatabaseUtils import CONST_DBFOLDER, registerPlaylist, initPlaylistDBEntry, doesPlaylistExist, readPlaylistEntry, createNewPlaylist
 
 class CheckPlaylistCommand(I_Command):
@@ -21,10 +22,10 @@ class CheckPlaylistCommand(I_Command):
 		try:
 			playlistObject = await getPlaylist(argsArr[1])
 		except BadPlaylistError as badPlaylistError:
-			await dcMsg.reply(repr(badPlaylistError))
+			await dcMsg.reply(f"Failed due to bad playlist: {repr(badPlaylistError)}")
 			return
 		except Exception as genericException:
-			await dcMsg.reply(repr(genericException))
+			await dcMsg.reply(f"Generic exception occured: {repr(genericException)}")
 			return
 
 		await dcMsg.channel.send("Successful in getting playlist information!")
