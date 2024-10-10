@@ -5,13 +5,13 @@ from classes.PlaylistObject import PlaylistObject
 from classes.BadPlaylistError import BadPlaylistError
 from util.invidious.PlaylistParserUtil import getPlaylist
 
-__dbFolder: str = os.path.join(os.getcwd(), "databases")
+CONST_DBFOLDER: str = os.path.join(os.getcwd(), "databases")
 
-def __doesPlaylistExist(playlistID: str, dbConnection: sqlite3.Connection, dbCursor: sqlite3.Cursor) -> bool:
+def doesPlaylistExist(playlistID: str, dbConnection: sqlite3.Connection, dbCursor: sqlite3.Cursor) -> bool:
 	dbCursor.execute("SELECT 1 FROM playlists WHERE playlistId = ?", (playlistID,))
 	return dbCursor.fetchone() is not None
 
-def __readPlaylistEntry(
+def readPlaylistEntry(
 	playlistID: str,
 	dbConnection: sqlite3.Connection,
 	dbCursor: sqlite3.Cursor,
@@ -32,7 +32,7 @@ def __readPlaylistEntry(
 	return PlaylistObject(playlistID, plMetadata[0], plMetadata[1], plMetadata[2], videos)
 
 
-def __modifyPlaylist(
+def modifyPlaylist(
 	playlistID: str,
 	dbConnection: sqlite3.Connection,
 	dbCursor: sqlite3.Cursor,
@@ -51,7 +51,7 @@ def __modifyPlaylist(
 
 	dbConnection.commit()
 
-def __createNewPlaylist(
+def createNewPlaylist(
 	playlistID: str,
 	dbConnection: sqlite3.Connection, 
 	dbCursor: sqlite3.Cursor,
@@ -74,7 +74,7 @@ def __createNewPlaylist(
 
 def registerPlaylist(playlistID: str, guildID: int, channelID: int):
 	# note channelID is not eternal and this simply stores which channel -ck was last invoked, which can change at any time
-	databasePath: str = os.path.join(__dbFolder, f"schedule.db")
+	databasePath: str = os.path.join(CONST_DBFOLDER, f"schedule.db")
 	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
 	dbCursor: sqlite3.Cursor = dbConnection.cursor()
 
@@ -91,24 +91,12 @@ def registerPlaylist(playlistID: str, guildID: int, channelID: int):
 		"INSERT OR IGNORE INTO schedule (playlistId, guildID, channelID) VALUES (?, ?, ?)",
 		(playlistID, guildID, channelID)
 	)
+	dbConnection.close()
 
-async def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
-	playlistObject: PlaylistObject = None
-
-	print("Attempting to get playlist...", end='', flush=True)
-	try:
-		playlistObject = await getPlaylist(playlistID)
-	except BadPlaylistError as badPlaylistError:
-		return repr(badPlaylistError)
-	except Exception as genericException:
-		return repr(genericException)
-
-	print("Successful in getting playlist information!", flush=True)
-
-	databasePath: str = os.path.join(__dbFolder, f"{guildID}.db")
-	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
-	dbCursor: sqlite3.Cursor = dbConnection.cursor()
-
+def initPlaylistDBEntry(
+	dbConnection: sqlite3.Connection, 
+	dbCursor: sqlite3.Cursor,
+) -> None:
 	dbCursor.execute("""
 		CREATE TABLE IF NOT EXISTS playlists (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -131,32 +119,3 @@ async def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
 		)"""
 	)
 	dbConnection.commit()
-
-	if (__doesPlaylistExist(playlistID, dbConnection, dbCursor)):
-		currStoredPlaylist: PlaylistObject = __readPlaylistEntry(playlistID, dbConnection, dbCursor)
-
-		missingVid: set[VideoObject] = currStoredPlaylist.getDiff(playlistObject)
-		newlyAdded: set[VideoObject] = playlistObject.getDiff(currStoredPlaylist)
-
-		__modifyPlaylist(playlistID, dbConnection, dbCursor, missingVid, newlyAdded)
-
-		if (len(missingVid) == 0 and len(newlyAdded) == 0):
-			dbConnection.close()
-			return "No changes found since last update"
-
-		retStr: str = "Playlist updated with changes:"
-
-		retStr += "\nVideos added:\n"
-		for vid in newlyAdded:
-			retStr += f"{vid.returnTupleWithPlaylist(playlistID)}\n"
-
-		retStr += "\nVideos removed:\n"
-		for vid in missingVid:
-			retStr += f"{vid.returnTupleWithPlaylist(playlistID)}\n"
-		
-		dbConnection.close()
-		return retStr
-
-	__createNewPlaylist(playlistID, dbConnection, dbCursor, playlistObject)
-	dbConnection.close()
-	return f"Sucessful creation of database for playlist {playlistID}"
