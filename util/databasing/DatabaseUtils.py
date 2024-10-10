@@ -75,7 +75,7 @@ def __createNewPlaylist(
 async def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
 	playlistObject: PlaylistObject = None
 
-	print("Attempting to get playlist...", end='')
+	print("Attempting to get playlist...", end='', flush=True)
 	try:
 		playlistObject = await getPlaylist(playlistID)
 	except BadPlaylistError as badPlaylistError:
@@ -83,7 +83,7 @@ async def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
 	except Exception as genericException:
 		return repr(genericException)
 
-	print("Successful in getting playlist information!")
+	print("Successful in getting playlist information!", flush=True)
 
 	databasePath: str = os.path.join(__dbFolder, f"{guildID}.db")
 	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
@@ -119,6 +119,9 @@ async def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
 		newlyAdded: set[VideoObject] = playlistObject.getDiff(currStoredPlaylist)
 
 		__modifyPlaylist(playlistID, dbConnection, dbCursor, missingVid, newlyAdded)
+
+		if (len(missingVid) == 0 and len(newlyAdded) == 0):
+			return "No changes found since last update"
 
 		retStr: str = "Playlist updated with changes:"
 
