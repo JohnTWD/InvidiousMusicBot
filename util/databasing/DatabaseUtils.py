@@ -72,6 +72,26 @@ def __createNewPlaylist(
 
 	dbConnection.commit()
 
+def registerPlaylist(playlistID: str, guildID: int, channelID: int):
+	# note channelID is not eternal and this simply stores which channel -ck was last invoked, which can change at any time
+	databasePath: str = os.path.join(__dbFolder, f"schedule.db")
+	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
+	dbCursor: sqlite3.Cursor = dbConnection.cursor()
+
+	dbCursor.execute("""
+		CREATE TABLE IF NOT EXISTS schedule (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			playlistId TEXT,
+			guildID INTEGER,
+			channelID INTEGER,
+		)
+	""")
+
+	dbCursor.execute(
+		"INSERT OR IGNORE INTO schedule (playlistId, guildID, channelID) VALUES (?, ?, ?)",
+		(playlistID, guildID, channelID)
+	)
+
 async def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
 	playlistObject: PlaylistObject = None
 
@@ -121,6 +141,7 @@ async def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
 		__modifyPlaylist(playlistID, dbConnection, dbCursor, missingVid, newlyAdded)
 
 		if (len(missingVid) == 0 and len(newlyAdded) == 0):
+			dbConnection.close()
 			return "No changes found since last update"
 
 		retStr: str = "Playlist updated with changes:"
@@ -132,7 +153,8 @@ async def updatePlaylistAndGetResponse(playlistID: str, guildID: int) -> str:
 		retStr += "\nVideos removed:\n"
 		for vid in missingVid:
 			retStr += f"{vid.returnTupleWithPlaylist(playlistID)}\n"
-
+		
+		dbConnection.close()
 		return retStr
 
 	__createNewPlaylist(playlistID, dbConnection, dbCursor, playlistObject)
