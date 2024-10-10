@@ -16,3 +16,6 @@ class PlaylistObject:
 			self.author,
 			self.authorId
 		)
+
+	def getDiff(self, otherPlaylistObject) -> set[VideoObject]: # returns videos that are not in the other set
+		return set(self.videos).difference(otherPlaylistObject)

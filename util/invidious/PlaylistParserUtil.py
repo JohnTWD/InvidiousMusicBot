@@ -7,7 +7,7 @@ from classes.PlaylistObject import PlaylistObject
 from classes.BadPlaylistError import BadPlaylistError
 
 
-async def getPlaylist(playlistID: str) -> PlaylistObject:
+async def getPlaylist(playlistID: str) -> PlaylistObject: # thanks https://old.reddit.com/r/Discord_Bots/comments/cmrake/sending_nonblocking_web_requests_with_discordpy/
 	apiUrl: str = currentActiveInstance + "/api/v1/playlists/" + playlistID + "?page=";
 	isPlaylistEnd: bool = False
 	currentPage: int = 1

@@ -12,6 +12,6 @@ class CheckPlaylistCommand(I_Command):
 		)
 
 	async def onInvoke(self, dcMsg: discord.Message, argsArr: list[str]) -> None:
-		print(f"Args passed: {argsArr[1]}")
+		await dcMsg.channel.send(f"Args passed: {argsArr[1]}...loading...")
 		resp: str = await updatePlaylistAndGetResponse(argsArr[1], dcMsg.guild.id)
 		await dcMsg.reply(resp)
