@@ -94,6 +94,13 @@ def registerPlaylistSchedule(playlistID: str, guildID: int, channelID: int):
 	dbConnection.commit()
 	dbConnection.close()
 
+def removePlaylistSchedule(playlistID: str, guildID: int, channelID: int):
+	databasePath: str = os.path.join(CONST_DBFOLDER, f"schedule.db")
+	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
+	dbCursor: sqlite3.Cursor = dbConnection.cursor()
+
+	dbCursor.execute("DELETE FROM videos WHERE playlistId = ? AND guildID = ? AND channelID = ?", (playlistID, guildID, channelID))
+
 def initPlaylistDBEntry(guildId: int) -> tuple[sqlite3.Connection, sqlite3.Cursor]: # WARNING: YOU HAVE TO MANUALLY CLOSE THE CONNECTION LATER
 	databasePath: str = os.path.join(CONST_DBFOLDER, f"{guildId}.db")
 	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
