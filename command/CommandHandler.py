@@ -2,15 +2,15 @@ import shlex
 import discord
 from command.I_Command import I_Command
 from command.commands.TestCommand import TestCommand
-from command.commands.ExamCommand import ExamCommand
 from command.commands.HelpCommand import HelpCommand
 from command.commands.CheckPlaylistCommand import CheckPlaylistCommand
+from command.commands.UnregisterPlaylistCommand import UnregisterPlaylistCommand
 
 commandList: tuple[I_Command] = (
 	TestCommand(),
-	ExamCommand(),
 	HelpCommand(),
-	CheckPlaylistCommand()
+	CheckPlaylistCommand(),
+	UnregisterPlaylistCommand()
 )
 
 @staticmethod
