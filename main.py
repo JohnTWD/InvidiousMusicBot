@@ -1,7 +1,14 @@
+import os
 import discord
 import requests
 from command.CommandHandler import tryInvokes
 from constants import currentActiveInstance, getToken, CMD_PREFIX
+
+def preInit() -> None:
+	try:
+		os.mkdir("databases")
+	except FileExistsError:
+		print("Database folder already made, skipping.")
 
 class IVMBot(discord.Client):
 	async def on_ready(self):
@@ -21,4 +28,4 @@ def main():
 	intents.message_content = True
 	IVMBotClient = IVMBot(intents=intents)
 	IVMBotClient.run(getToken())
-if (__name__=="__main__"):	main()
+if (__name__=="__main__"):	preInit(); main();
