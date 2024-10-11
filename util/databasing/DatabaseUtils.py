@@ -30,7 +30,6 @@ def readPlaylistEntry(
 
 	return PlaylistObject(playlistID, plMetadata[0], plMetadata[1], plMetadata[2], videos)
 
-
 def modifyPlaylist(
 	playlistID: str,
 	dbConnection: sqlite3.Connection,
@@ -71,12 +70,7 @@ def createNewPlaylist(
 
 	dbConnection.commit()
 
-def registerPlaylistSchedule(playlistID: str, guildID: int, channelID: int):
-	# note channelID is not eternal and this simply stores which channel -ck was last invoked, which can change at any time
-	databasePath: str = os.path.join(CONST_DBFOLDER, f"schedule.db")
-	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
-	dbCursor: sqlite3.Cursor = dbConnection.cursor()
-
+def __initPlaylistSchedule(dbConnection: sqlite3.Connection, dbCursor: sqlite3.Cursor):
 	dbCursor.execute("""
 		CREATE TABLE IF NOT EXISTS schedule (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,6 +79,30 @@ def registerPlaylistSchedule(playlistID: str, guildID: int, channelID: int):
 			channelID INTEGER
 		)"""
 	)
+
+	dbConnection.commit()
+
+def readPlaylistSchedule() -> list[tuple[str, int, int]]: # return order: playlistID, guildID, channelID
+	databasePath: str = os.path.join(CONST_DBFOLDER, f"schedule.db")
+	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
+	dbCursor: sqlite3.Cursor = dbConnection.cursor()
+
+	__initPlaylistSchedule(dbConnection, dbCursor)
+
+	dbCursor.execute("SELECT playlistId, guildID, channelID FROM schedule")
+	schedRows: list[tuple[str, int, int]] = dbCursor.fetchall()
+	
+	dbConnection.close()
+
+	return schedRows
+
+def registerPlaylistSchedule(playlistID: str, guildID: int, channelID: int):
+	# note channelID is not eternal and this simply stores which channel -ck was last invoked, which can change at any time
+	databasePath: str = os.path.join(CONST_DBFOLDER, f"schedule.db")
+	dbConnection: sqlite3.Connection = sqlite3.connect(databasePath)
+	dbCursor: sqlite3.Cursor = dbConnection.cursor()
+
+	__initPlaylistSchedule(dbConnection, dbCursor)
 
 	dbCursor.execute(
 		"INSERT OR IGNORE INTO schedule (playlistId, guildID, channelID) VALUES (?, ?, ?)",
