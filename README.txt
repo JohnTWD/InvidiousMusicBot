@@ -6,6 +6,10 @@ This is a Discord Bot that does the following:
 API Documentation
 https://docs.invidious.io/api/
 
+Setup instructions:
+	- `python3 -m venv bot-env`
+	- `pip install -r requirements.txt`
+
 
 Todo:
 	- https://www.geeksforgeeks.org/python-sqlite/ Learn sqlite
